@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 #
 # djangocms_reversion2 documentation build configuration file, created by
 # sphinx-quickstart on Wed May 24 16:48:47 2017.

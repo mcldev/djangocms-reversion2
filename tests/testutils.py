@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 from cms.api import add_plugin
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
 

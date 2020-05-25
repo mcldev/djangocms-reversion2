@@ -18,6 +18,4 @@ class CMSReversion2Config(AppConfig):
     def ready(self):
         connect_all_plugins()
 
-    def _setup(self):
-        print('xxx')
 

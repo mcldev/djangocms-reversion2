@@ -222,5 +222,5 @@ msgid "go back"
 msgstr "Zurück"
 
 #: djangocms_reversion2/templates/admin/view_revision.html:8
-msgid "This is an archieved version of page"
+msgid "This is an archived version of page"
 msgstr "Das ist eine archivierte Version der Seite"

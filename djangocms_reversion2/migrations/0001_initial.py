@@ -1,8 +1,8 @@
-# -*- coding: utf-8 -*-
+
 from __future__ import unicode_literals
 
 from django.db import migrations, models
-
+import django
 
 class Migration(migrations.Migration):
 
@@ -21,8 +21,8 @@ class Migration(migrations.Migration):
                 ('comment', models.TextField(help_text='Particular information concerning this Version', verbose_name='Comment', blank=True)),
                 ('title', models.CharField(max_length=63, verbose_name='Name', blank=True)),
                 ('active', models.BooleanField(default=False, help_text='This the active version of current draft. There can be only one such version per Page version tree.', verbose_name='Active')),
-                ('draft', models.ForeignKey(related_name='page_versions', verbose_name='Draft', to='cms.Page', help_text='Current active draft.')),
-                ('hidden_page', models.OneToOneField(related_name='page_version', verbose_name='Hidden Page', to='cms.Page', help_text='This Page object holds the versioned contents of this PageVersion.')),
+                ('draft', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='page_versions', verbose_name='Draft', to='cms.Page', help_text='Current active draft.')),
+                ('hidden_page', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='page_version', verbose_name='Hidden Page', to='cms.Page', help_text='This Page object holds the versioned contents of this PageVersion.')),
             ],
             options={
                 'abstract': False,
