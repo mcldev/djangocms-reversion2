@@ -171,11 +171,11 @@ class PageVersionAdmin(admin.ModelAdmin):
         sorted_grouped_revisions = sorted(grouped_revisions.items(), key=lambda i: i[0], reverse=True)
 
         # differences between the placeholders
-        if left is 'pageVersion':
+        if left == 'pageVersion':
             l_page = left_page.hidden_page
         else:
             l_page = left_page
-        if right is 'pageVersion':
+        if right == 'pageVersion':
             r_page = right_page.hidden_page
         else:
             r_page = right_page
