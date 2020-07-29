@@ -1,6 +1,6 @@
 
-from setuptools import find_packages
-from distutils.core import setup
+from setuptools import find_packages, setup
+
 from djangocms_reversion2 import __version__
 
 CLASSIFIERS = [
