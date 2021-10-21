@@ -20,6 +20,27 @@ def mark_title_dirty(sender, instance, **kwargs):
     make_page_version_dirty(page, language)
 
 
+def is_static_placeholder(placeholder):
+    return placeholder.static_draft.exists() or placeholder.static_public.exists()
+
+
+def update_static_placeholder(static_placeholder, kwargs):
+    language = kwargs.get('language')
+    if is_static_placeholder(static_placeholder):
+        static_placeholder.static_public.all().delete()
+        for static_plugin in static_placeholder.static_draft.all():
+            static_plugin.publish(kwargs['request'], language)
+
+
+def handle_placeholder_prechange(**kwargs):
+    language = kwargs.get('language')
+    source_placeholder = kwargs.get('source_placeholder', None)
+    target_placeholder = kwargs.get('target_placeholder', None)
+    if source_placeholder != target_placeholder:
+        #  Catch moving a plugin out of the Static Placeholder
+        update_static_placeholder(source_placeholder, kwargs)
+
+
 def handle_placeholder_change(**kwargs):
     language = kwargs.get('language')
     placeholder = kwargs.get('placeholder')
@@ -32,6 +53,12 @@ def handle_placeholder_change(**kwargs):
 
     if page:
         make_page_version_dirty(page, language)
+
+    # Automatically publish Static Placeholders as no way to get page
+    elif target_placeholder or placeholder:
+        static_placeholder = target_placeholder or placeholder
+        update_static_placeholder(static_placeholder, kwargs)
+
 
 
 def handle_page_publish(**kwargs):
@@ -108,8 +135,9 @@ def handle_page_delete(sender, instance, **kwargs):
 
 
 def connect_all_plugins():
-    from cms.signals import post_placeholder_operation, post_publish, pre_obj_operation
+    from cms.signals import post_placeholder_operation, pre_placeholder_operation, post_publish, pre_obj_operation
 
+    pre_placeholder_operation.connect(handle_placeholder_prechange, dispatch_uid='reversion2_pre_placeholder')
     post_placeholder_operation.connect(handle_placeholder_change, dispatch_uid='reversion2_placeholder')
     signals.post_save.connect(mark_title_dirty, sender='cms.Title', dispatch_uid='reversion2_title')
     signals.pre_delete.connect(handle_page_delete, sender='cms.Page', dispatch_uid='reversion2_page')
