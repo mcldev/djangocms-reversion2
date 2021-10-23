@@ -21,7 +21,8 @@ def mark_title_dirty(sender, instance, **kwargs):
 
 
 def is_static_placeholder(placeholder):
-    return placeholder.static_draft.exists() or placeholder.static_public.exists()
+    if placeholder:
+        return placeholder.static_draft.exists() or placeholder.static_public.exists()
 
 
 def update_static_placeholder(static_placeholder, kwargs):
