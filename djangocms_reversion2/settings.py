@@ -1,5 +1,6 @@
 from django.conf import settings
 
+USE_REVERSION_SEARCH_INDEX = getattr(settings, 'REVERSION2_USE_REVERSION_SEARCH_INDEX', True)
 EXCLUDE_VERSIONS_FROM_SEARCH = getattr(settings, 'REVERSION2_EXCLUDE_VERSIONS_FROM_SEARCH', True)
 
 # Include/Exclude templates
