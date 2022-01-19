@@ -17,57 +17,48 @@ from .settings import VERSION_ROOT_TITLE, VERSION_START_VALUE, BIN_ROOT_TITLE, P
     BATCH_ADD_UNVERSIONED_ONLY, BIN_BUCKET_NAMING, BIN_PAGE_LANGUAGE
 
 
-def copy_page(page,
-              parent_page,
+def copy_page(source_page,
+              version_root_page,
               version_id=None,
               language=None,
               include_descendants=False):
-
     if include_descendants:
-        new_page = page.copy_with_descendants(target_node=parent_page.node,
-                                              position='last-child',
-                                              copy_permissions=False,
-                                              target_site=page.node.site)
+        version_page = source_page.copy_with_descendants(target_node=version_root_page.node,
+                                                         position='last-child',
+                                                         copy_permissions=False,
+                                                         target_site=source_page.node.site)
     else:
-        new_page = page.copy(
-            site=page.node.site,
-            parent_node=parent_page.node,
-            language=language,
-            translations=True,
-            permissions=False,
-            extensions=True)
+        version_page = source_page.copy(site=source_page.node.site,
+                                        parent_node=version_root_page.node,
+                                        language=language,
+                                        translations=True,
+                                        permissions=False,
+                                        extensions=True)
 
     # Get translations i.e. on delete it's all languages, on version only 1
     if language:
-        translations = new_page.title_set.filter(language=language)
+        translations = version_page.title_set.filter(language=language)
     else:
-        translations = new_page.title_set.all()
+        translations = version_page.title_set.all()
 
     # copy titles of this page
-    for title in translations:
-        title_slug = page.get_slug(language=language)
+    for version_title_obj in translations:
+        set_title_slug_and_path(source_page, version_root_page, version_title_obj, language, version_id, save=True)
 
-        new_slug = get_hidden_page_slug(title_slug, language, version_id)
+    version_page.in_navigation = False
+    version_page.save()
 
-        base = parent_page.get_path(language)
-        new_path = '%s/%s' % (base, new_slug) if base else title.slug
-        title.slug = new_slug
-        title.path = new_path
-        title.save()
+    version_page.clear_cache(menu=True)
 
-    new_page.in_navigation = False
-    new_page.save()
-
-    new_page.clear_cache(menu=True)
-
-    return new_page
+    return version_page
 
 
-def get_or_create_version_page_root(site, user, language=settings.LANGUAGES[0][0]):
+def get_or_create_version_root_page(site, user, language=settings.LANGUAGES[0][0]):
     try:
         version_page = Page.objects.get(title_set__title=VERSION_ROOT_TITLE,
                                         publisher_is_draft=True,
-                                        node__site=site)
+                                        node__site=site,
+                                        title_set__language=language)
     except Page.DoesNotExist:
         version_page = api.create_page(VERSION_ROOT_TITLE,
                                        constants.TEMPLATE_INHERITANCE_MAGIC,
@@ -116,10 +107,20 @@ def get_or_create_bin_page_root(site):
     return bin_page
 
 
-def get_hidden_page_slug(slug, language, version_id):
-    return slugify('{slug}-{lang}-{ver}'.format(slug=slug,
-                                                lang=language,
-                                                ver=str(version_id).replace('.', '-')))
+def set_title_slug_and_path(source_page, version_root_page, version_title_obj, language, version_id, save=True):
+    slug = source_page.title_set.get(language=language).slug
+    ver = str(version_id).replace('.', '-')
+    new_slug = slugify(f'{source_page.id}-{language}-{ver}-{slug}')
+
+    base = version_root_page.title_set.first().path
+    new_path = '%s/%s' % (base, new_slug) if base else version_title_obj.slug
+    version_title_obj.slug = new_slug
+    version_title_obj.path = new_path
+    if save:
+        version_title_obj.save()
+
+    return version_title_obj
+
 
 
 def revise_page(page, language, user, version_id=None):
@@ -150,10 +151,10 @@ def revise_page(page, language, user, version_id=None):
 
     # Get Version root page
     site = page.node.site
-    version_page_root = get_or_create_version_page_root(site=site, user=user)
+    version_root_page = get_or_create_version_root_page(site=site, user=user, language=language)
 
     # create a copy of this page
-    new_page = copy_page(page, version_id=version_id, parent_page=version_page_root, language=language)
+    new_page = copy_page(page, version_id=version_id, version_root_page=version_root_page, language=language)
 
     # Publish the page if required
     if PUBLISH_HIDDEN_PAGE:
