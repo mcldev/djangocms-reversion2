@@ -6,19 +6,16 @@ from djangocms_reversion2 import __version__
 CLASSIFIERS = [
     'Development Status :: 5 - Production/Stable',
     'Framework :: Django',
+    'Framework :: Django :: 4.2',
+    'Framework :: Django CMS :: 3.11',
     'Environment :: Web Environment',
     'Intended Audience :: Developers',
     'Operating System :: OS Independent',
     'Programming Language :: Python',
     'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.4',
-    'Programming Language :: Python :: 3.5',
-    'Programming Language :: Python :: 3.6',
-    'Programming Language :: Python :: 3.7',
-    'Programming Language :: Python :: 3.8',
-    'Framework :: Django',
-    'Framework :: Django :: 1.11',
-    'Framework :: Django :: 2.2',
+    'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.10',
+    'Programming Language :: Python :: 3.11',
     'Topic :: Internet :: WWW/HTTP',
     'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
     'Topic :: Software Development :: Libraries :: Python Modules',
@@ -26,10 +23,11 @@ CLASSIFIERS = [
 ]
 
 REQUIREMENTS = [
-    'django>=1.11',
-    'django-cms>=3.4.3',
-    'django-sekizai>=1.0.0',
+    'django>=4.2,<5.0',
+    'django-cms>=3.11,<3.12',
+    'django-sekizai>=4.0.0',
     'lxml',
+    'lxml-html-clean',
 ]
 
 setup(
@@ -42,6 +40,7 @@ setup(
     url='https://github.com/mcldev/djangocms-reversion2',
     download_url='https://github.com/mcldev/djangocms-reversion2/archive/{}.zip'.format(__version__),
     install_requires=REQUIREMENTS,
+    python_requires='>=3.9',
     keywords=['django', 'Django CMS', 'version history', 'versioning',
               'reversion', 'revision', 'CMS', 'Blueshoe', 'basket', 'bin', 'revert'],
     classifiers=CLASSIFIERS,

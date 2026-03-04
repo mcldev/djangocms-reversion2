@@ -1,10 +1,7 @@
 
-from __future__ import unicode_literals
-
 from cms.api import publish_page
 from cms.models import User
 from django import forms
-from six import string_types
 from versionfield.widgets import VersionWidget
 
 from djangocms_reversion2.settings import VERSION_START_VALUE, ALLOW_BLANK_TITLE, BIN_ROOT_TITLE, \

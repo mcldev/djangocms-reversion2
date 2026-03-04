@@ -5,9 +5,8 @@ from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.urls import reverse
-from django.utils.encoding import python_2_unicode_compatible, force_text
-from django.utils.translation import ugettext_lazy as _
-from six import string_types
+from django.utils.encoding import force_str
+from django.utils.translation import gettext_lazy as _
 from treebeard.mp_tree import MP_Node
 from versionfield import VersionField
 
@@ -15,7 +14,6 @@ from djangocms_reversion2.settings import ALLOW_BLANK_TITLE
 from .utils import revise_page
 
 
-@python_2_unicode_compatible
 class PageVersion(MP_Node):
     hidden_page = models.OneToOneField('cms.Page', on_delete=models.CASCADE, verbose_name=_('Hidden Page'),
                                        related_name='page_version', help_text=_('This Page object holds the versioned '
@@ -117,7 +115,7 @@ class PageVersion(MP_Node):
         user = get_current_user()
         if user:
             try:
-                owner = force_text(user)
+                owner = force_str(user)
             except AttributeError:
                 # AnonymousUser may not have USERNAME_FIELD
                 owner = "anonymous"
@@ -128,7 +126,7 @@ class PageVersion(MP_Node):
         else:
             owner = "script"
 
-        if isinstance(user, string_types):
+        if isinstance(user, str):
             from cms.models import User
             user = User.objects.get(username=user)
 

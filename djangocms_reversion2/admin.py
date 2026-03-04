@@ -4,13 +4,13 @@ from cms.models import Page
 from cms.utils import get_language_from_request
 from cms.utils.page_permissions import user_can_view_page, user_can_publish_page, user_can_change_page
 from cms.utils.permissions import get_current_user
-from django.conf.urls import url
+from django.urls import re_path
 from django.contrib import admin, messages
 from django.contrib.admin.options import IS_POPUP_VAR
 from django.urls import reverse
 from django.http.response import Http404
-from django.shortcuts import redirect, render_to_response, get_object_or_404, render
-from django.utils.translation import ugettext_lazy as _
+from django.shortcuts import redirect, get_object_or_404, render
+from django.utils.translation import gettext_lazy as _
 from sekizai.context import SekizaiContext
 
 from djangocms_reversion2.diff import create_placeholder_contents
@@ -35,10 +35,10 @@ class PageVersionAdmin(admin.ModelAdmin):
     def get_urls(self):
         urls = super(PageVersionAdmin, self).get_urls()
         admin_urls = [
-            url(r'^diff-view/page/(?P<page_pk>\d+)/left/(?P<left_pk>\d+)/right/(?P<right_pk>\d+)/$',self.diff_view, name='djangocms_reversion2_diff_view'),
-            url(r'^revert/page/(?P<page_pk>\d+)/to/(?P<version_pk>\d+)$', self.revert, name='djangocms_reversion2_revert_page'),
-            url(r'^batch-add/(?P<pk>\w+)$', self.batch_add, name='djangocms_reversion2_pagerevision_batch_add'),
-            url(r'^view-revision/(?P<revision_pk>\d+)$', view_revision, name='djangocms_reversion2_view_revision'),
+            re_path(r'^diff-view/page/(?P<page_pk>\d+)/left/(?P<left_pk>\d+)/right/(?P<right_pk>\d+)/$',self.diff_view, name='djangocms_reversion2_diff_view'),
+            re_path(r'^revert/page/(?P<page_pk>\d+)/to/(?P<version_pk>\d+)$', self.revert, name='djangocms_reversion2_revert_page'),
+            re_path(r'^batch-add/(?P<pk>\w+)$', self.batch_add, name='djangocms_reversion2_pagerevision_batch_add'),
+            re_path(r'^view-revision/(?P<revision_pk>\d+)$', view_revision, name='djangocms_reversion2_view_revision'),
         ]
         return admin_urls + urls
 
@@ -244,7 +244,8 @@ class PageVersionAdmin(admin.ModelAdmin):
         return resp
 
     def render_close_frame(self):
-        return render_to_response('admin/close_frame.html', {})
+        from django.http import HttpResponse
+        return HttpResponse('<script>window.close();</script>')
 
     def get_form(self, request, obj=None, **kwargs):
         form = super(PageVersionAdmin, self).get_form(request, obj=obj, **kwargs)
