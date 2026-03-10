@@ -1,0 +1,40 @@
+Metadata-Version: 2.4
+Name: djangocms-reversion2
+Version: 2.0.0
+Summary: page versioning for django-cms
+Home-page: https://github.com/mcldev/djangocms-reversion2
+Download-URL: https://github.com/mcldev/djangocms-reversion2/archive/2.0.0.zip
+Author: Daniel Pollithy, Michael Carder
+Keywords: django,Django CMS,version history,versioning,reversion,revision,CMS,Blueshoe,basket,bin,revert
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Framework :: Django
+Classifier: Framework :: Django :: 4.2
+Classifier: Framework :: Django CMS :: 3.11
+Classifier: Environment :: Web Environment
+Classifier: Intended Audience :: Developers
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Topic :: Internet :: WWW/HTTP
+Classifier: Topic :: Internet :: WWW/HTTP :: Dynamic Content
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: Software Development :: Libraries :: Application Frameworks
+Requires-Python: >=3.9
+License-File: LICENSE
+Requires-Dist: django<5.0,>=4.2
+Requires-Dist: django-cms<3.12,>=3.11
+Requires-Dist: django-sekizai>=4.0.0
+Requires-Dist: lxml
+Requires-Dist: lxml-html-clean
+Dynamic: author
+Dynamic: classifier
+Dynamic: download-url
+Dynamic: home-page
+Dynamic: keywords
+Dynamic: license-file
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
