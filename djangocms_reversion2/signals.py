@@ -135,8 +135,24 @@ def handle_page_delete(sender, instance, **kwargs):
 #     pass
 
 
+def track_page_login_required(sender, instance, **kwargs):
+    """Capture the old login_required value before save."""
+    if not instance.pk:
+        return
+    try:
+        from cms.models import Page
+        old_inst = Page.objects.only('login_required').get(pk=instance.pk)
+        if instance.login_required != old_inst.login_required:
+            for title in instance.title_set.all():
+                language = title.language
+                make_page_version_dirty(instance, language)
+    except Page.DoesNotExist:
+        instance._old_login_required = None
+
+
 def connect_all_plugins():
     from cms.signals import post_placeholder_operation, pre_placeholder_operation, post_publish, pre_obj_operation
+    from django.db.models.signals import pre_save
 
     pre_placeholder_operation.connect(handle_placeholder_prechange, dispatch_uid='reversion2_pre_placeholder')
     post_placeholder_operation.connect(handle_placeholder_change, dispatch_uid='reversion2_placeholder')
@@ -147,4 +163,5 @@ def connect_all_plugins():
     post_publish.connect(handle_page_publish, dispatch_uid='reversion2_page_publish')
     pre_obj_operation.connect(handle_page_reverted_to_live,
                                dispatch_uid='reversion2_page_revert_to_live')
+    pre_save.connect(track_page_login_required, sender='cms.Page', dispatch_uid='reversion2_track_page_login_required')
 

@@ -78,7 +78,7 @@ class PageVersionAdmin(admin.ModelAdmin):
         make_page_version_dirty(page, language)
 
         messages.info(request, _(u'You have succesfully reverted to {rev}').format(rev=page_version))
-        return self.render_close_frame()
+        return self.render_close_frame(str(_(u'You have succesfully reverted to {rev}').format(rev=page_version)))
 
     # Not currently used - TODO
     def batch_add(self, request, **kwargs):
@@ -154,7 +154,7 @@ class PageVersionAdmin(admin.ModelAdmin):
                 left = 'pageVersion'
             else:
                 messages.info(request, _(u'There are no snapshots for this page'))
-                return self.render_close_frame()
+                return self.render_close_frame(str(_(u'There are no snapshots for this page')))
         else:
             left = 'pageVersion'
             left_page = PageVersion.objects.get(pk=left_pk)
@@ -224,8 +224,15 @@ class PageVersionAdmin(admin.ModelAdmin):
                 raise Http404
 
         if page.page_versions.filter(active=True, dirty=False, language=language).exists():
-            messages.info(request, _('This page already has a saved revision.'))
-            return self.render_close_frame()
+            if self.do_publish_on_save(request):
+                # Publish the page even though no new version is needed
+                from cms.api import publish_page
+                publish_page(page, user, language)
+                msg = str(_('Page published. No new version needed as page already has a saved revision.'))
+            else:
+                msg = str(_('This page already has a saved revision.'))
+            messages.info(request, msg)
+            return self.render_close_frame(msg)
 
         return super(PageVersionAdmin, self).add_view(request, form_url=form_url, extra_context=extra_context)
 
@@ -243,9 +250,29 @@ class PageVersionAdmin(admin.ModelAdmin):
             return self.render_close_frame()
         return resp
 
-    def render_close_frame(self):
+    def render_close_frame(self, message=''):
         from django.http import HttpResponse
-        return HttpResponse('<script>window.close();</script>')
+        message_html = ''
+        if message:
+            message_html = '<ul class="messagelist"><li class="info">{msg}</li></ul>'.format(msg=message)
+        return HttpResponse(
+            '<!DOCTYPE html><html><head><title>Close</title></head><body>'
+            '{message_html}'
+            '<script>'
+            '(function() {{'
+            '  try {{'
+            '    if (window.parent && window.parent.CMS) {{'
+            '      window.parent.CMS.API.Helpers.reloadBrowser();'
+            '    }} else {{'
+            '      window.close();'
+            '    }}'
+            '  }} catch(e) {{'
+            '    window.close();'
+            '  }}'
+            '}})();'
+            '</script>'
+            '</body></html>'.format(message_html=message_html)
+        )
 
     def get_form(self, request, obj=None, **kwargs):
         form = super(PageVersionAdmin, self).get_form(request, obj=obj, **kwargs)

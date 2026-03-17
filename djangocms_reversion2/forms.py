@@ -53,7 +53,7 @@ class PageVersionForm(forms.ModelForm):
             if hasattr(self, 'publish_on_save') and self.publish_on_save:
                 from cms.utils.permissions import get_current_user
                 user = get_current_user()
-                if isinstance(user, string_types):
+                if isinstance(user, str):
                     user = User.objects.get(username=user)
                 publish_page(draft, user, language)
 
